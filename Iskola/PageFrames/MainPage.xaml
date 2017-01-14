@@ -1,0 +1,56 @@
+﻿<Page
+    x:Class="Iskola.PageFrames.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Iskola.PageFrames"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:convert="using:Iskola.Converters"
+    xmlns:controls="using:Iskola.Controls"
+    mc:Ignorable="d"
+    Background="Black">
+
+    <Page.Resources>
+        <convert:ItemCountToVisbility x:Name="CountToVisibility"/>
+    </Page.Resources>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Pivot>
+            <PivotItem Header="Domů" >
+                <ScrollViewer Margin="0,0,0,40" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled">
+                    <StackPanel>
+                        <controls:MainSquare SquareHeader="Rozvrh">
+                            <controls:TableControl Table="{Binding Client.ActualTable}" Margin="5,0"/>
+                        </controls:MainSquare>
+                        <controls:MainSquare SquareHeader="Hodnocení v průběhu týdne" Margin="0,15,0,0" Visibility="{Binding Client.NewestMarks.Count,Converter={StaticResource CountToVisibility}}">
+                            <ListView ItemsSource="{Binding Client.NewestMarks}" SelectionMode="None" IsItemClickEnabled="False" Margin="5,0">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <RelativePanel>
+                                            <TextBlock x:Name="date" Text="{Binding Date}" FontSize="12"/>
+                                            <TextBlock x:Name="midText" Text=", vložil/a" RelativePanel.RightOf="date" FontSize="12"/>
+                                            <TextBlock Text="{Binding Teacher}" RelativePanel.RightOf="midText" Margin="2,0,0,0" FontSize="12"/>
+                                            <TextBlock x:Name="subject" Text="{Binding Subject}" RelativePanel.Below="date"/>
+                                            <TextBlock x:Name="midText2" Text="," RelativePanel.RightOf="subject" RelativePanel.AlignBottomWith="subject"/>
+                                            <TextBlock Text="{Binding Value}" RelativePanel.RightOf="midText2" RelativePanel.AlignBottomWith="subject" Margin="2,0,0,0" FontWeight="Bold"/>
+                                        </RelativePanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Padding" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                            </ListView>
+                        </controls:MainSquare>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+            <PivotItem Header="Hodnocení">
+                <controls:MainSquare SquareHeader="Přehled prospěchu" VerticalAlignment="Stretch">
+                    <controls:AllMarksList x:Name="marks" VerticalAlignment="Stretch"/>
+                </controls:MainSquare>
+            </PivotItem>
+        </Pivot>
+
+    </Grid>
+</Page>

@@ -1,0 +1,55 @@
+﻿<ContentDialog
+    x:Class="Iskola.Dialogs.MarkInfoDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Iskola.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converter="using:Iskola.Converters"
+    mc:Ignorable="d"
+    Title="Známka"
+    Name="Main"
+    PrimaryButtonText="OK">
+    <ContentDialog.Resources>
+        <converter:ValueToVisibility x:Key="ValToVis"/>
+        <converter:InvertedBoolToVisibilityConverter x:Key="NotBoolToVis"/>
+    </ContentDialog.Resources>
+    <Grid x:Name="mainGrid">
+        <ProgressRing Visibility="Visible" Height="130" Width="130" IsActive="{Binding IsLoading,ElementName=Main,Mode=TwoWay}"/>
+        <Grid x:Name="markInfoGrid" Visibility="{Binding IsLoading,ElementName=Main,Converter={StaticResource NotBoolToVis},Mode=TwoWay}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Předmět" />
+            <TextBlock Text="{Binding Subject}" Grid.Column="1"/>
+            <TextBlock Text="Datum zkoušky" Grid.Row="1"/>
+            <TextBlock Text="{Binding Date}"  Grid.Column="1" Grid.Row="1"/>
+            <TextBlock Text="Datum zadání zkoušky" TextWrapping="Wrap" Grid.Row="2"/>
+            <TextBlock Text="{Binding DateOfEnter}"  Grid.Column="1" Grid.Row="2"/>
+            <TextBlock Text="Hodnocení" Grid.Row="3"/>
+            <TextBlock Text="{Binding Value}"  Grid.Column="1" Grid.Row="3"/>
+            <TextBlock x:Name="valab" Text="Váha hodnocení" Grid.Row="4" Visibility="{Binding MarkValuability,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="{Binding MarkValuability}" Grid.Column="1" Grid.Row="4" Visibility="{Binding MarkValuability,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="Zadal" Grid.Row="5"/>
+            <TextBlock Text="{Binding Teacher}"  Grid.Column="1" Grid.Row="5"/>
+            <TextBlock Text="Okruh učiva" Grid.Row="6" Visibility="{Binding TeachingOkruh,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="{Binding TeachingOkruh}"  Grid.Column="1" Grid.Row="6" Visibility="{Binding TeachingOkruh,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="Za co hodnoceni" Grid.Row="7" Visibility="{Binding ForWhat,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="{Binding ForWhat}"  Grid.Column="1" Grid.Row="7" Visibility="{Binding ForWhat,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="Stručný komentář" Grid.Row="8" Visibility="{Binding StructComment,Converter={StaticResource ValToVis}}"/>
+            <TextBlock Text="{Binding StructComment}"  Grid.Column="1" Grid.Row="8" Visibility="{Binding StructComment,Converter={StaticResource ValToVis}}"/>
+        </Grid>
+    </Grid>
+</ContentDialog>

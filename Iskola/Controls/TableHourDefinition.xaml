@@ -1,0 +1,17 @@
+﻿<UserControl
+    x:Class="Iskola.Controls.TableHourDefinition"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Iskola.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    Name="Main">
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="{Binding HourNumber,Mode=TwoWay,ElementName=Main}" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding FromTo,Mode=TwoWay,ElementName=Main}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+    </StackPanel>
+</UserControl>

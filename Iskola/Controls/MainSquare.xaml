@@ -1,0 +1,24 @@
+﻿<UserControl
+    x:Class="Iskola.Controls.MainSquare"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Iskola.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    Name="Main"
+    HorizontalAlignment="Stretch">
+
+    <Grid HorizontalAlignment="Stretch" Background="#ecf0f1" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Background="#3598db" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TextBlock Text="{Binding SquareHeader,ElementName=Main}" FontWeight="Bold" Foreground="White" Margin="5"/>
+        </Border>
+        <ContentPresenter Grid.Row="1" Content="{Binding Content,ElementName=Main}" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" />
+    </Grid>
+</UserControl>

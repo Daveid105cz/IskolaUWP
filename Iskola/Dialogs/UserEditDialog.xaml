@@ -1,0 +1,18 @@
+﻿<ContentDialog
+    x:Class="Iskola.Dialogs.UserEditDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Iskola.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Upravit uživatele"
+    PrimaryButtonText="Upravit"
+    SecondaryButtonText="Zrušit"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+    <StackPanel>
+        <TextBox x:Name="login" Header="Login:" PlaceholderText="Login" Text="{Binding Credential.Username}" Margin="0,10,0,0"/>
+        <PasswordBox x:Name="password" Header="Heslo:" PlaceholderText="Heslo" Password="{Binding Credential.Password}" Margin="0,30,0,0"/>
+        <TextBox x:Name="school" Header="Škola:" PlaceholderText="Škola" Text="{Binding Credential.School}" Margin="0,30"/>
+    </StackPanel>
+</ContentDialog>
