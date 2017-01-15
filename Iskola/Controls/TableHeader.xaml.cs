@@ -33,7 +33,7 @@ namespace Iskola.Controls
                 {
                     var v = new TableHourDefinition()
                     {
-                        DataContext = actualHourDefinition
+                        HourDefinition = actualHourDefinition
                     };
                     Grid.SetColumn(v, actualHourDefinition.HourNumber);
                     DefinitionsStack.Children.Add(v);

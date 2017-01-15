@@ -11,7 +11,7 @@
     Name="Main">
 
     <StackPanel Orientation="Vertical">
-        <TextBlock Text="{Binding HourNumber,Mode=TwoWay,ElementName=Main}" HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding FromTo,Mode=TwoWay,ElementName=Main}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding HourDefinition.HourNumber,Mode=TwoWay,ElementName=Main}" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding HourDefinition.FromTo,Mode=TwoWay,ElementName=Main}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
     </StackPanel>
 </UserControl>

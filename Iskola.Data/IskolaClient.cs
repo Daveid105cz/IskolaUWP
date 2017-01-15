@@ -59,7 +59,7 @@ namespace Iskola.Data
 
         public async Task LoadMarking()
         {
-            String response = await LoadRequest("ttps://www.iskola.cz/?cast=Hodnoceni&akce=zak");
+            String response = await LoadRequest("https://www.iskola.cz/?cast=Hodnoceni&akce=zak");
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(response);
             _marksTable = DataParser.GetMarks(doc);

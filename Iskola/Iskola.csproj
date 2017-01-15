@@ -131,6 +131,9 @@
     <Compile Include="Dialogs\MarkInfoDialog.xaml.cs">
       <DependentUpon>MarkInfoDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\SubjectInfoDialog.xaml.cs">
+      <DependentUpon>SubjectInfoDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\UserAddDialog.xaml.cs">
       <DependentUpon>UserAddDialog.xaml</DependentUpon>
     </Compile>
@@ -247,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\MarkInfoDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SubjectInfoDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
