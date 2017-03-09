@@ -6,16 +6,17 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:selectors="using:Iskola.StyleSelectors"
+    xmlns:converters="using:Iskola.Converters"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignWidth="400"
+    Name="Main">
     <UserControl.Resources>
         <selectors:MarksStyleSelector x:Key="MarkStyleSelector"/>
     </UserControl.Resources>
     <Grid>
-
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="screenSize">
+            <VisualStateGroup x:Name="ScreenSize">
                 <VisualStateGroup.States>
                     <VisualState x:Name="Wide">
                         <VisualState.StateTriggers>
@@ -46,12 +47,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+  
         <TextBlock Text="Předmět" Margin="2,0,0,0" FontWeight="Bold"/>
         <TextBlock x:Name="MarkingHeader" Text="Hodnocení" Grid.Column="1" FontWeight="Bold"/>
         <TextBlock Text="Vysvědč." Grid.Column="2" FontWeight="Bold"/>
         <TextBlock Text="Průměr" Grid.Column="3" FontWeight="Bold"/>
         <ListView IsItemClickEnabled="False" SelectionMode="None" 
-                  ItemsSource="{Binding RatedSubjects}" 
+                  ItemsSource="{Binding Marks.RatedSubjects,ElementName=Main}" 
                   Grid.ColumnSpan="4" 
                   Grid.Row="1"
                   ItemContainerStyleSelector="{StaticResource MarkStyleSelector}">

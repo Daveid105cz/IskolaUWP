@@ -1,81 +1,51 @@
 ﻿using HtmlAgilityPack;
+using Iskola.Data.DataTabs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Iskola.Data
 {
-    public class IskolaClient
+    public partial class IskolaClient : INotifyPropertyChanged
     {
+
         private String _SID;
         private String _BID;
 
         private String _username;
+        private String _loginUsername;
+        private String _password;
+        private String _school;
+        public String Username { get { return _username; } internal set { _username = value;InvokePropertyChanged("Username"); } }
 
-        #region Public User info
-        //New marks list
-        ObservableCollection<NewMark> _newMarks = new ObservableCollection<NewMark>();
-        public ObservableCollection<NewMark> NewestMarks { get { return _newMarks; } }
+        public ReadOnlyCollection<DataTab> DataTabs { get { return _dataTabs.AsReadOnly(); } }
+        private List<DataTab> _dataTabs = new List<DataTab>();
 
-        //Actual day table
-        Table _actualTable;
-        public Table ActualTable { get { return _actualTable; } }
+        public DataTab MainDataTab { get { return _dataTabs[0]; } }
+        public DataTab RatingDataTab { get { return _dataTabs[1]; } }
 
-        //News
-        ObservableCollection<NewsMessage> _news = new ObservableCollection<NewsMessage>();
-        public ObservableCollection<NewsMessage> News { get { return _news; } }
-        
-        //All Marks table
-        MarksTable _marksTable;
-        public MarksTable MarksTable { get { return _marksTable; } }
-        #endregion
         public async Task<ConnectionResult> Login(String Username,String Password,String School)
         {
+            _loginUsername = Username;
+            _password = Password;
+            _school = School;
             ConnectionResult connectionResult = await LoginState(Username, Password,School);
-            if (connectionResult==ConnectionResult.Success)
+            if (connectionResult == ConnectionResult.Success)
             {
-                String mainPageContent = await LoadRequest("https://www.iskola.cz/?akce=hlavni");
-                HtmlDocument mainPageDocument = new HtmlDocument();
-                mainPageDocument.LoadHtml(mainPageContent);
-                //Get marks from server and put them into collection
-                _newMarks.Clear();
-                foreach (NewMark m in DataParser.GetNewMarks(mainPageDocument))
-                {
-                    _newMarks.Add(m);
-                }
-                _actualTable = DataParser.GetTable(mainPageDocument);
-
-                 foreach (NewsMessage n in DataParser.GetNews(mainPageDocument))
-                 {
-                     _news.Add(n);
-                 }
-                 await LoadMarking();
+                InitDataTabs();
+                await _dataTabs[0].DownloadDataAsync();
             }
-            return connectionResult;
+                return connectionResult;
         }
-
-        public async Task LoadMarking()
+        private void InitDataTabs()
         {
-            String response = await LoadRequest("https://www.iskola.cz/?cast=Hodnoceni&akce=zak");
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(response);
-            _marksTable = DataParser.GetMarks(doc);
-        }
-
-        private Dictionary<long, MarkInfo> _markInfoBuffer = new Dictionary<long, MarkInfo>();
-        public async Task<MarkInfo> GetMarkInfo(long ID)
-        {
-            if (_markInfoBuffer.ContainsKey(ID))
-                return _markInfoBuffer[ID];
-            String response = await LoadRequest("https://www.iskola.cz/?cast=Hodnoceni&akce=znamka&id=" + ID.ToString());
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(response);
-            MarkInfo loadedMarkInfo = DataParser.GetMarkInfo(doc);
-            _markInfoBuffer.Add(ID, loadedMarkInfo);
-            return loadedMarkInfo;
+            _dataTabs.Add(new MainDataTab(this));
+            _dataTabs.Add(new RatingDataTab(this));
         }
         private async Task<ConnectionResult> LoginState(String Usr, String Psd,String Sch)
         {
@@ -118,32 +88,69 @@ namespace Iskola.Data
             }
         }
 
-        private HttpClientHandler GetHandler()
+        #region MainDataAccess
+        private HttpClientHandler GetHandler(bool AllowAutoRedirect)
         {
             HttpClientHandler handler = new HttpClientHandler()
             {
-                AllowAutoRedirect = true,
+                AllowAutoRedirect = AllowAutoRedirect,
                 UseCookies = true,
                 CookieContainer = new CookieContainer()
             };
             handler.CookieContainer.SetCookies(new Uri("https://www.iskola.cz"), "sid=" + _SID + ";bid=" + _BID);
             return handler;
         }
-        private async Task<String> LoadRequest(String Uri)
+        internal async Task<String> LoadRequest(String Uri,bool AllowAutoRedirect = true)
         {
-            using (HttpClient client = new HttpClient(GetHandler()))
+            using (HttpClient client = new HttpClient(GetHandler(AllowAutoRedirect)))
             {
                 HttpResponseMessage responseMessage = await client.GetAsync(Uri);
                 String responsedHTML = await responseMessage.Content.ReadAsStringAsync();
-                //TODO: Add check for timeout and then raise OnTimoutRaised to ask user to Re-Login
+                HtmlDocument document = new HtmlDocument();
+                document.LoadHtml(responsedHTML);
+                if (AllowAutoRedirect != false)
+                {
+                    bool isLogouted = CheckLogin(document);
+                    if (isLogouted && OnTimeoutRaised != null && await OnTimeoutRaised.Invoke())
+                    {
+                        ConnectionResult connectionResult = await LoginState(_loginUsername, _password, _school);
+                        if (connectionResult == ConnectionResult.Success)
+                            return await LoadRequest(Uri, AllowAutoRedirect);
+                        else
+                            OnLoginFailed?.Invoke();
+                    }
+                }
                 return responsedHTML;
             }
         }
 
-        //Now completely useless!!
-        public delegate bool TimeoutRaisedHandler();
+        private static bool CheckLogin(HtmlDocument doc)
+        {
+            return (doc.DocumentNode.LastChild.LastChild.FirstChild.GetAttributeValue("class", "NIC") == "neprihlaseny");
+        }
+
+        public delegate Task<bool> TimeoutRaisedHandler();
         public event TimeoutRaisedHandler OnTimeoutRaised;
-    }
+
+        public delegate void LoginFailedHandler();
+        public event LoginFailedHandler OnLoginFailed;
+        #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void InvokePropertyChanged(String Property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Property));
+        }
+        public async void Logout()
+        {
+            await LoadRequest("https://www.iskola.cz/?cast=Uzivatel&akce=odhlas",false);
+            foreach(DataTab proceededDataTable in _dataTabs)
+            {
+                proceededDataTable.LogoutClear();
+            }
+            _dataTabs.Clear();
+        }
+    }   
     public enum ConnectionResult
     {
         Success,

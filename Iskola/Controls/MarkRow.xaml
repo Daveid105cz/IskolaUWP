@@ -11,26 +11,26 @@
 
     <Grid>
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="screenSize">
+            <VisualStateGroup x:Name="ScreenSize">
                 <VisualStateGroup.States>
-                    <VisualState x:Name="wideMode">
+                    <VisualState x:Name="WideMode">
                         <VisualState.StateTriggers>
                             <AdaptiveTrigger MinWindowWidth="600"/>
                         </VisualState.StateTriggers>
                         <VisualState.Setters>
-                            <Setter Target="MarksBlock.(Grid.Row)" Value="0"/>
-                            <Setter Target="MarksBlock.(Grid.Column)" Value="1"/>
-                            <Setter Target="MarksBlock.(Grid.ColumnSpan)" Value="1"/>
+                            <Setter Target="MarksContainer.(Grid.Row)" Value="0"/>
+                            <Setter Target="MarksContainer.(Grid.Column)" Value="1"/>
+                            <Setter Target="MarksContainer.(Grid.ColumnSpan)" Value="1"/>
                         </VisualState.Setters>
                     </VisualState>
-                    <VisualState x:Name="sMode">
+                    <VisualState x:Name="NarrowMode">
                         <VisualState.StateTriggers>
                             <AdaptiveTrigger MinWindowWidth="0"/>
                         </VisualState.StateTriggers>
                         <VisualState.Setters>
-                            <Setter Target="MarksBlock.(Grid.Row)" Value="1"/>
-                            <Setter Target="MarksBlock.(Grid.Column)" Value="0"/>
-                            <Setter Target="MarksBlock.(Grid.ColumnSpan)" Value="4"/>
+                            <Setter Target="MarksContainer.(Grid.Row)" Value="1"/>
+                            <Setter Target="MarksContainer.(Grid.Column)" Value="0"/>
+                            <Setter Target="MarksContainer.(Grid.ColumnSpan)" Value="4"/>
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup.States>
@@ -46,7 +46,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="MarksBlock" local:TextBlockExtension.Marks="{Binding Marks}" Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        <TextBlock x:Name="MarksContainer" local:TextBlockExtension.Marks="{Binding Marks}"
+            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap"/>
         <TextBlock Text="{Binding SubjectName}" TextWrapping="Wrap" Grid.Row="0" Margin="2,0,0,0"/>
         <TextBlock Text="{Binding Qualification}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding Average}" Grid.Column="3"  Grid.Row="0" HorizontalAlignment="Center"/>

@@ -49,34 +49,32 @@ namespace Iskola.Controls
                     if (actualColumnsCount < actualDay.Hours.Count)
                         AddColumnsTo(actualDay.Hours.Count);
                     bool[] schoolActionPresentArray = new bool[actualDay.Hours.Count];
-                    foreach (Hour actualHour in actualDay.Hours)
+                    foreach (SchoolAction actualSchoolAction in actualDay.SchoolActions)
                     {
-                        if (actualHour.Subjects.Count > 0 && actualHour.Subjects[0].IsSchoolAction)
+                        int actualIndex = actualSchoolAction.ActionPosition;
+                        for (int i = actualIndex; i < actualIndex + actualSchoolAction.ActionLenght; i++)
                         {
-                            Subject schoolActionSubject = actualHour.Subjects[0];
-                            int actualIndex = actualHour.HourNumber;
-                            for (int i = actualIndex; i < actualIndex + schoolActionSubject.SchoolActionLenght; i++)
-                            {
-                                schoolActionPresentArray[i] = true;
-                            }
-                            Rectangle rec = new Rectangle()
-                            {
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Height = 20,
-                                Fill = new SolidColorBrush(Colors.Red)
-                            };
-                            Grid.SetColumnSpan(rec, schoolActionSubject.SchoolActionLenght);
-                            Grid.SetColumn(rec, actualHour.HourNumber);
-                            SubjectsStack.Children.Add(rec);
-                            TextBlock teb = new TextBlock()
-                            {
-                                Text = schoolActionSubject.SchoolActionName,
-                                VerticalAlignment = VerticalAlignment.Top
-                            };
-                            Grid.SetColumnSpan(teb, schoolActionSubject.SchoolActionLenght);
-                            Grid.SetColumn(teb, actualHour.HourNumber);
-                            SubjectsStack.Children.Add(teb);
+                            schoolActionPresentArray[i] = true;
                         }
+                        Rectangle schoolActionBackgroundRectangle = new Rectangle()
+                        {
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Height = 20,
+                            Fill = new SolidColorBrush(Colors.LightCyan)
+                        };
+                        Grid.SetColumnSpan(schoolActionBackgroundRectangle, actualSchoolAction.ActionLenght);
+                        Grid.SetColumn(schoolActionBackgroundRectangle, actualSchoolAction.ActionPosition);
+                        SubjectsStack.Children.Add(schoolActionBackgroundRectangle);
+                        TextBlock schoolActionTextBlock = new TextBlock()
+                        {
+                            Text = actualSchoolAction.ActionName,
+                            TextWrapping= TextWrapping.Wrap,
+                            Height=20,
+                            VerticalAlignment = VerticalAlignment.Top
+                        };
+                        Grid.SetColumnSpan(schoolActionTextBlock, actualSchoolAction.ActionLenght);
+                        Grid.SetColumn(schoolActionTextBlock, actualSchoolAction.ActionPosition);
+                        SubjectsStack.Children.Add(schoolActionTextBlock);
                     }
                     foreach(var s in actualDay.Hours)
                     {
@@ -115,22 +113,16 @@ namespace Iskola.Controls
         {
             if(hour.Subjects.Count>1)
             {
-                StackPanel sp = new StackPanel();
+                StackPanel stackPanel = new StackPanel();
                 foreach (Subject actualSubject in hour.Subjects)
                 {
-                    if (!actualSubject.IsSchoolAction)
-                    {
-                        sp.Children.Add(new SubjectBox() { DataContext = actualSubject });
-                    }
+                        stackPanel.Children.Add(new SubjectBox() { DataContext = actualSubject });
                 }
-                return sp;
+                return stackPanel;
             }
             else if(hour.Subjects.Count==1)
             {
-                if (!hour.Subjects[0].IsSchoolAction)
-                {
                     return new SubjectBox() { DataContext = hour.Subjects[0]};
-                }
             }
             return null;
         }

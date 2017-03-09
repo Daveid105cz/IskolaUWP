@@ -16,7 +16,7 @@ namespace Iskola.Converters
                     returnColor =  Colors.LightGray;
                    break;
                 case Data.SubjectState.Canceled:
-                    returnColor =  Colors.MediumVioletRed;
+                    returnColor =  Colors.PaleVioletRed;
                     break;
                 default:returnColor = Colors.White;break;
             }

@@ -12,8 +12,18 @@ using Windows.UI.Xaml.Documents;
 
 namespace Iskola.Controls
 {
-    public sealed partial class AllMarksList : UserControl
+    public partial class AllMarksList : UserControl
     {
+        public MarksTable Marks
+        {
+            get { return (MarksTable)GetValue(MarksProperty); }
+            set { SetValue(MarksProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Marks.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MarksProperty =
+            DependencyProperty.Register("Marks", typeof(MarksTable), typeof(AllMarksList), new PropertyMetadata(null));
+
 
         public AllMarksList()
         {
@@ -33,48 +43,26 @@ namespace Iskola.Controls
             new PropertyMetadata(new List<Mark>(), (sender, e) =>
             {
                 List<Mark> marks = e.NewValue as List<Mark>; ;
-                var textBl = sender as TextBlock;
-                if (textBl != null)
+                var localTextBlock = sender as TextBlock;
+                if (localTextBlock != null)
                 {
-                    textBl.Unloaded -= TextBl_Unloaded;
-                    textBl.Unloaded += TextBl_Unloaded;
-                    textBl.Inlines.Clear();
-                    foreach(Mark m in marks)
+                    localTextBlock.Inlines.Clear();
+                    foreach(Mark actualMark in marks)
                     {
-                        Hyperlink link = new Hyperlink();
-                        _hyperlinksDatabase.Add(link, m);
-                        link.Click += Link_Click;
-                        link.Inlines.Add(new Run { Text = m.Value });
-                        textBl.Inlines.Add(link);
-                        if (marks.Last() != m)
+                        Hyperlink hyperlink = new Hyperlink();
+                        hyperlink.Click += async (lSender, args) => 
                         {
-                            textBl.Inlines.Add(new Run() { Text = ", " });
+                            MarkInfoDialog markInfoDialog = new MarkInfoDialog(actualMark.ID);
+                            await markInfoDialog.ShowDialogAsync();
+                        };
+                        hyperlink.Inlines.Add(new Run { Text = actualMark.Value });
+                        localTextBlock.Inlines.Add(hyperlink);
+                        if (marks.Last() != actualMark)
+                        {
+                            localTextBlock.Inlines.Add(new Run() { Text = ", " });
                         }
                     }
                 }
             }));
-
-        private static void TextBl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            TextBlock tb = sender as TextBlock;
-            tb.Unloaded -= TextBl_Unloaded;
-            foreach(var t in tb.Inlines)
-            {
-                if(t is Hyperlink)
-                {
-                    _hyperlinksDatabase.Remove(t as Hyperlink);
-                    Debug.WriteLine("removing item from dictionary");
-                }
-            }
-        }
-
-        private static Dictionary<Hyperlink, Mark> _hyperlinksDatabase = new Dictionary<Hyperlink, Mark>();
-        private async static void Link_Click(Hyperlink sender, HyperlinkClickEventArgs args)
-        {
-            //TODO: Open dialog with info about mark
-            Mark selectedMark = _hyperlinksDatabase[sender];
-            MarkInfoDialog mid = new MarkInfoDialog(selectedMark.ID);
-            await mid.ShowAsync();
-        }
     }
 }

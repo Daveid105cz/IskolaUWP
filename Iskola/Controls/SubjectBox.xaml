@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <converters:SubjectStateToColor x:Key="StateToColorConverter" />
     </UserControl.Resources>
-    <Border BorderThickness="1,1,1,1"  CornerRadius="3,3,3,3" BorderBrush="Gray" Background="{Binding State,Converter={StaticResource StateToColorConverter}}"  VerticalAlignment="Top" Padding="5">
+    <Border BorderThickness="1,1,1,1"  CornerRadius="2" BorderBrush="Gray" Background="{Binding State,Converter={StaticResource StateToColorConverter}}"  VerticalAlignment="Top" Padding="5">
         <StackPanel>
             <TextBlock Text="{Binding SubjectName}" TextAlignment="Center"/>
         </StackPanel>

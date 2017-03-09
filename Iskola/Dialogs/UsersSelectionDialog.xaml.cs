@@ -54,7 +54,7 @@ namespace Iskola.Dialogs
         {
             this.Hide();
             UserEditDialog ued = new UserEditDialog(credenc);
-            await ued.ShowAsync();
+            await ued.ShowDialogAsync();
         }
         private void ListView_ItemClick(object sender, ItemClickEventArgs e)
         {

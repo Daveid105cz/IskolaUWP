@@ -8,57 +8,58 @@
     mc:Ignorable="d"
     Background="{ThemeResource AppBarToggleButtonBackgroundChecked}"
     >
-
-    <Grid Background="{ThemeResource AppBarToggleButtonBackgroundChecked}">
+    <ScrollViewer ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="screenSize">
+            <VisualStateGroup x:Name="ScreenSize">
                 <VisualStateGroup.States>
-                    <VisualState x:Name="wideMode">
+                    <VisualState x:Name="WideMode">
                         <VisualState.StateTriggers>
                             <AdaptiveTrigger MinWindowWidth="800"/>
                         </VisualState.StateTriggers>
                         <VisualState.Setters>
-                            <Setter Target="colL.(Grid.Width)" Value="1.2*"/>
-                            <Setter Target="colR.(Grid.Width)" Value="1.2*"/>
+                            <Setter Target="ColumnL.(Grid.Width)" Value="1.2*"/>
+                            <Setter Target="ColumnR.(Grid.Width)" Value="1.2*"/>
                         </VisualState.Setters>
                     </VisualState>
-                    <VisualState x:Name="sMode">
+                    <VisualState x:Name="NarrowMode">
                         <VisualState.StateTriggers>
                             <AdaptiveTrigger MinWindowWidth="0"/>
                         </VisualState.StateTriggers>
                         <VisualState.Setters>
-                            <Setter Target="colL.(Grid.Width)" Value="0.4*"/>
-                            <Setter Target="colR.(Grid.Width)" Value="0.4*"/>
+                            <Setter Target="ColumnL.(Grid.Width)" Value="0.4*"/>
+                            <Setter Target="ColumnR.(Grid.Width)" Value="0.4*"/>
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup.States>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="colL" Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition x:Name="colR" Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <ProgressRing x:Name="loggingInStatusRing" Grid.Column="1" Visibility="Visible"  Height="130" Width="130" Foreground="White" VerticalAlignment="Top" Margin="45,35,45,0"/>
-        <StackPanel x:Name="loginTable" Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top"  Margin="0,-4,0,0">
-            <Image HorizontalAlignment="Center" Height="68" Margin="0,68,0,68" VerticalAlignment="Top" Width="68" Source="Assets/Logos/AppLogo.png"/>
-            <Grid>
-                <Button Click="SelectUser_Click">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE125;" />
+        <Grid Background="{ThemeResource AppBarToggleButtonBackgroundChecked}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="ColumnL" Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition x:Name="ColumnR" Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <ProgressRing x:Name="LoggingStatusRing" Grid.ColumnSpan="3" Visibility="Visible"  Height="130" Width="130" Foreground="White" VerticalAlignment="Top" Margin="45,35,45,0"/>
+            <StackPanel x:Name="LoginPanel" Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top"  Margin="0,-4,0,0">
+                <Image HorizontalAlignment="Center" Height="68" Margin="0,68,0,68" VerticalAlignment="Top" Width="68" Source="Assets/Logos/AppLogo.png"/>
+                <Grid>
+                    <Button Click="SelectUser_Click">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE125;" />
+                    </Button>
+                    <Button HorizontalAlignment="Center" Click="AddNew_Click">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE1E2;" />
+                    </Button>
+                    <Button HorizontalAlignment="Right" Click="ClearCurrent_Click">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" />
+                    </Button>
+                </Grid>
+                <TextBox x:Name="Login" PlaceholderText="Login" Margin="0,10,0,0"/>
+                <PasswordBox x:Name="Password" PlaceholderText="Heslo" Margin="0,30,0,0"/>
+                <TextBox x:Name="School" PlaceholderText="Škola" Margin="0,30"/>
+                <Button x:Name="LoginButton" HorizontalAlignment="Center" Background="#cce6ff" BorderBrush="#3399db" Click="loginButton_Click">
+                    <TextBlock Text="Přihlásit" FontSize="18" Foreground="#3399db"/>
                 </Button>
-                <Button HorizontalAlignment="Center" Click="AddNew_Click">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE1E2;" />
-                </Button>
-                <Button HorizontalAlignment="Right" Click="ClearCurrent_Click">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" />
-                </Button>
-            </Grid>
-            <TextBox x:Name="login" PlaceholderText="Login" Margin="0,10,0,0"/>
-            <PasswordBox x:Name="password" PlaceholderText="Heslo" Margin="0,30,0,0"/>
-            <TextBox x:Name="school" PlaceholderText="Škola" Margin="0,30"/>
-            <Button x:Name="loginButton" HorizontalAlignment="Center" Background="#cce6ff" BorderBrush="#3399db" Click="loginButton_Click">
-                <TextBlock Text="Přihlásit" FontSize="18" Foreground="#3399db"/>
-            </Button>
-        </StackPanel>
-    </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </Page>

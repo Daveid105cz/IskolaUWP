@@ -115,6 +115,9 @@
     <Compile Include="Controls\SubjectBox.xaml.cs">
       <DependentUpon>SubjectBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TabItem.xaml.cs">
+      <DependentUpon>TabItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TableControl.xaml.cs">
       <DependentUpon>TableControl.xaml</DependentUpon>
     </Compile>
@@ -128,6 +131,7 @@
     <Compile Include="Converters\ItemCountToVisbility.cs" />
     <Compile Include="Converters\SubjectStateToColor.cs" />
     <Compile Include="Converters\ValueToVisibility.cs" />
+    <Compile Include="DialogHelper.cs" />
     <Compile Include="Dialogs\MarkInfoDialog.xaml.cs">
       <DependentUpon>MarkInfoDialog.xaml</DependentUpon>
     </Compile>
@@ -234,6 +238,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\SubjectBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TabItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

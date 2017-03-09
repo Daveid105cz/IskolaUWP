@@ -24,8 +24,25 @@ namespace Iskola
     /// </summary>
     sealed partial class App : Application
     {
-        public static IskolaClient Client { get; set; }
+        public static IskolaClient Client { get; private set; }
 
+        internal static void Logout()
+        {
+            if (Client != null)
+            {
+                if (App.MainFrame.CanGoBack)
+                    App.MainFrame.GoBack();
+                App.MainFrame.BackStack.Clear();
+                App.Client.Logout();
+                App.Client = null;
+                GC.Collect();
+            }
+        }
+        internal static IskolaClient CreateClient()
+        {
+            App.Client = new IskolaClient();
+            return App.Client;
+        }
         public static Frame MainFrame { get { return Window.Current.Content as Frame; } }
 
         /// <summary>

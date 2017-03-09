@@ -1,4 +1,5 @@
 ﻿using Iskola.Data;
+using Iskola.Data.DataTabs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,7 +44,7 @@ namespace Iskola.Dialogs
 
         private async void MarkInfoDialog_Opened(ContentDialog sender, ContentDialogOpenedEventArgs args)
         {
-            DataContext = await App.Client.GetMarkInfo(_ID);
+            DataContext = await (App.Client.RatingDataTab as RatingDataTab).GetMarkInfo(_ID);
             IsLoading = false;
         }
     }

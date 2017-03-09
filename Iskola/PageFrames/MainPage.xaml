@@ -9,20 +9,44 @@
     xmlns:controls="using:Iskola.Controls"
     mc:Ignorable="d"
     Background="Black">
-
+    <Page.Transitions>
+        <TransitionCollection>
+            <EdgeUIThemeTransition Edge="Bottom"/>
+        </TransitionCollection>
+    </Page.Transitions>
+    <Page.BottomAppBar>
+        <CommandBar Name="MainCommandBar">
+            <AppBarButton Label="Odhlásit se" Click="LogoutAppBarButton_Click">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="Aktualizovat" Click="RefreshAppBarButton_Click">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE149;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <CommandBar.Content>
+                <StackPanel Orientation="Vertical" Margin="2">
+                    <TextBlock Text="Přihlášen jako:" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Client.Username}" FontSize="16" FontWeight="Bold"/>
+                </StackPanel>
+            </CommandBar.Content>
+        </CommandBar>
+    </Page.BottomAppBar>
     <Page.Resources>
-        <convert:ItemCountToVisbility x:Name="CountToVisibility"/>
+        <convert:ItemCountToVisbility x:Key="CountToVisibility"/>
     </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Pivot>
-            <PivotItem Header="Domů" >
-                <ScrollViewer Margin="0,0,0,40" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled">
+        <Pivot SelectionChanged="MainPivot_SelectionChanged" Name="MainPivot">
+            <controls:TabItem Header="Domů">
+                <ScrollViewer Margin="0,0,0,2" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled">
                     <StackPanel>
                         <controls:MainSquare SquareHeader="Rozvrh">
-                            <controls:TableControl Table="{Binding Client.ActualTable}" Margin="5,0"/>
+                            <controls:TableControl Table="{Binding ActualTable}" Margin="5,0"/>
                         </controls:MainSquare>
-                        <controls:MainSquare SquareHeader="Hodnocení v průběhu týdne" Margin="0,15,0,0" Visibility="{Binding Client.NewestMarks.Count,Converter={StaticResource CountToVisibility}}">
-                            <ListView ItemsSource="{Binding Client.NewestMarks}" SelectionMode="None" IsItemClickEnabled="False" Margin="5,0">
+                        <controls:MainSquare SquareHeader="Hodnocení v průběhu týdne" Margin="0,15,0,0" Visibility="{Binding NewestMarks.Count,Converter={StaticResource CountToVisibility}}">
+                            <ListView ItemsSource="{Binding NewestMarks}" SelectionMode="None" IsItemClickEnabled="False" Margin="5,0">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <RelativePanel>
@@ -44,12 +68,14 @@
                         </controls:MainSquare>
                     </StackPanel>
                 </ScrollViewer>
-            </PivotItem>
-            <PivotItem Header="Hodnocení">
-                <controls:MainSquare SquareHeader="Přehled prospěchu" VerticalAlignment="Stretch">
-                    <controls:AllMarksList x:Name="marks" VerticalAlignment="Stretch"/>
-                </controls:MainSquare>
-            </PivotItem>
+            </controls:TabItem>
+            <controls:TabItem Header="Hodnocení">
+                <Grid VerticalAlignment="Stretch">
+                    <controls:MainSquare SquareHeader="Přehled prospěchu" VerticalAlignment="Stretch">
+                        <controls:AllMarksList Marks="{Binding Marks}"/>
+                    </controls:MainSquare>
+                </Grid>
+            </controls:TabItem>
         </Pivot>
 
     </Grid>

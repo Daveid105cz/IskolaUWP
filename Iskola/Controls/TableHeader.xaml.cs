@@ -24,19 +24,19 @@ namespace Iskola.Controls
         {
             if (!Created && DataContext != null)
             {
-                List<HourDefinition> definitions = this.DataContext as List<HourDefinition>;
+                ICollection<HourDefinition> definitions = this.DataContext as ICollection<HourDefinition>;
                 DefinitionsStack.Children.Clear();
                 int actualColumnsCount = DefinitionsStack.ColumnDefinitions.Count;
                 if (actualColumnsCount < definitions.Count)
                     AddColumnsTo(definitions.Count);
                 foreach (HourDefinition actualHourDefinition in definitions)
                 {
-                    var v = new TableHourDefinition()
+                    TableHourDefinition tableHourDefinition = new TableHourDefinition()
                     {
                         HourDefinition = actualHourDefinition
                     };
-                    Grid.SetColumn(v, actualHourDefinition.HourNumber);
-                    DefinitionsStack.Children.Add(v);
+                    Grid.SetColumn(tableHourDefinition, actualHourDefinition.HourNumber);
+                    DefinitionsStack.Children.Add(tableHourDefinition);
                 }
                 Created = true;
             }

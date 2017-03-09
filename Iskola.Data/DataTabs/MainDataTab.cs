@@ -1,15 +1,52 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace Iskola.Data
+namespace Iskola.Data.DataTabs
 {
-    internal static  class DataParser
+    public class MainDataTab:DataTab
     {
-        internal static List<NewMark> GetNewMarks(HtmlDocument doc)
+        ObservableCollection<NewMark> _newMarks = new ObservableCollection<NewMark>();
+        public ObservableCollection<NewMark> NewestMarks { get { return _newMarks; } }
+
+        Table _actualTable;
+        public Table ActualTable { get { return _actualTable; } internal set { _actualTable = value; PropertyChanged_Invoke("ActualTable"); } }
+
+        ObservableCollection<NewsMessage> _news = new ObservableCollection<NewsMessage>();
+        public ObservableCollection<NewsMessage> News { get { return _news; } }
+
+        public MainDataTab(IskolaClient Client) : base(Client) { }
+
+        protected async override Task DownloadData()
+        {
+            String mainPageContent = await Client.LoadRequest("https://www.iskola.cz/?akce=hlavni");
+            HtmlDocument mainPageDocument = new HtmlDocument();
+            mainPageDocument.LoadHtml(mainPageContent);
+            Client.Username = GetUserName(mainPageDocument);
+            _newMarks.Clear();
+            foreach (NewMark m in GetNewMarks(mainPageDocument))
+            {
+                _newMarks.Add(m);
+            }
+            ActualTable = GetTable(mainPageDocument);
+            _news.Clear();
+            foreach (NewsMessage n in GetNews(mainPageDocument))
+            {
+                _news.Add(n);
+            }
+        }
+        internal override void LogoutClear()
+        {
+            _newMarks.Clear();
+            _news.Clear();
+        }
+        private static List<NewMark> GetNewMarks(HtmlDocument doc)
         {
             List<NewMark> marks = new List<NewMark>();
             var nodes = doc.DocumentNode.Descendants().Where(node => node.Id == "dlazdiceZnamka");
@@ -34,7 +71,7 @@ namespace Iskola.Data
             }
             return marks;
         }
-        internal static Table GetTable(HtmlDocument doc)
+        private static Table GetTable(HtmlDocument doc)
         {
             IEnumerable<HtmlNode> nodes = doc.DocumentNode.Descendants().Where(node => { return node.GetAttributeValue("class", "/NULL/") == "tableRozvrh prohlizeni"; });
             if (nodes.Count() > 0)
@@ -42,9 +79,9 @@ namespace Iskola.Data
                 HtmlNode tableNode = nodes.ElementAt(0);
                 Table table = new Table();
                 ushort HourID = 0;
-                foreach(var node in tableNode.FirstChild.FirstChild.ChildNodes)
+                foreach (var node in tableNode.FirstChild.FirstChild.ChildNodes)
                 {
-                    if(node.GetAttributeValue("class", "N").Contains("zahlaviHodina"))
+                    if (node.GetAttributeValue("class", "N").Contains("zahlaviHodina"))
                     {
                         HourDefinition hd = new HourDefinition();
                         hd.FromTo = node.LastChild.InnerText;
@@ -80,14 +117,15 @@ namespace Iskola.Data
                                         String className = actualSubject.GetAttributeValue("class", "NULL");
                                         if (className == "skolniAkce" && actualSubject.HasChildNodes)
                                         {
-                                            newSubject.IsSchoolAction = true;
-                                            newSubject.SchoolActionName = actualSubject.InnerText;
+                                            SchoolAction newSchoolAction = new SchoolAction();
+                                            newSchoolAction.ActionName = actualSubject.InnerText;
                                             String styleWidthValue = actualSubject.FirstChild.GetAttributeValue("style", "width: 120px");
                                             int width = Convert.ToInt32(styleWidthValue.Remove(styleWidthValue.Length - 3).Split(' ')[1]) + 1;
-                                            newSubject.SchoolActionLenght = width / 120;
-                                            newHour.Subjects.Add(newSubject);
+                                            newSchoolAction.ActionLenght = (width + 10) / 123;
+                                            newSchoolAction.ActionPosition = newHour.HourNumber;
+                                            newDay.SchoolActions.Add(newSchoolAction);
                                         }
-                                        else if(className!="skolniAkce")
+                                        else if (className != "skolniAkce")
                                         {
                                             newSubject.Title = actualSubject.GetAttributeValue("title", "Title Not Found");
                                             newSubject.Title = newSubject.Title.Replace("&#10;", "\n").Replace("&#13;", "");
@@ -106,7 +144,7 @@ namespace Iskola.Data
                                             }
                                             newHour.Subjects.Add(newSubject);
                                         }
-                                        
+
                                     }
                                 }
                                 HourID++;
@@ -126,7 +164,17 @@ namespace Iskola.Data
             }
             return null;
         }
-        internal static List<NewsMessage> GetNews(HtmlDocument doc)
+        private static void SetDayInfo(HtmlNode usedNode, Day day)
+        {
+            IEnumerable<HtmlNode> nodes = usedNode.Descendants().Where(node => node.Name == "th");
+            if (nodes.Count() > 0)
+            {
+                HtmlNode dayNode = nodes.ElementAt(0);
+                day.DayInWeek = dayNode.ChildNodes[0].InnerText;
+                day.Date = dayNode.ChildNodes[1].InnerText.Replace("(", "").Replace(")", "");
+            }
+        }
+        private static List<NewsMessage> GetNews(HtmlDocument doc)
         {
             List<NewsMessage> news = new List<NewsMessage>();
             IEnumerable<HtmlNode> nodes = doc.DocumentNode.Descendants().Where(node => node.Id == "dlazdiceNovinky");
@@ -136,7 +184,7 @@ namespace Iskola.Data
 
                 foreach (var node in newsNode.ChildNodes)
                 {
-                    if (node.Name == "div" && node.GetAttributeValue("class","NULL")=="novinkaDlazdice")
+                    if (node.Name == "div" && node.GetAttributeValue("class", "NULL") == "novinkaDlazdice")
                     {
                         NewsMessage newMessage = new NewsMessage();
                         newMessage.Date = node.ChildNodes[0].InnerText;
@@ -148,108 +196,14 @@ namespace Iskola.Data
             }
             return news;
         }
-
-        internal static MarksTable GetMarks(HtmlDocument doc)
-        { 
-            IEnumerable<HtmlNode> nodes = doc.DocumentNode.Descendants().Where(node => node.Id=="vypis");
-            if(nodes.Count()>0)
-            {
-                HtmlNode mainNode = nodes.ElementAt(0).LastChild;
-                MarksTable marksTable = new MarksTable();
-                foreach(var node in mainNode.ChildNodes)
-                {
-                    RatedSubject newRatedSubject = new RatedSubject();
-                    newRatedSubject.SubjectName = node.FirstChild.InnerText;
-                    newRatedSubject.Qualification = node.ChildNodes[2].InnerText;
-                    newRatedSubject.Average = node.LastChild.InnerText;
-                    HtmlNode marksNode = node.ChildNodes[1];
-                    foreach (HtmlNode actualMarkNode in marksNode.Descendants().Where(nd => nd.Name == "a"))
-                    {
-                        Mark newMark = new Mark();
-                        newMark.Value = actualMarkNode.InnerText;
-                        String idValue = actualMarkNode.GetAttributeValue("href", "NULL");
-                        newMark.ID = Convert.ToInt64(idValue.Split(new String[] { ";id=" }, StringSplitOptions.None)[1]);
-                        String titleText = actualMarkNode.GetAttributeValue("title", "NULL").Replace("&#10;", "");
-                        String[] properties = titleText.Split(new String[] { "&#13;" }, StringSplitOptions.None);
-                        foreach (String property in properties)
-                        {
-                            String[] splittedProperty = property.Split(':');
-                            switch (splittedProperty[0].Trim())
-                            {
-                                case "Datum zkoušky": newMark.Date = splittedProperty[1].Trim(); break;
-                                case "Zadal": newMark.Teacher = splittedProperty[1].Trim(); break;
-                                case "Okruh učiva": newMark.TeachingOkruh = splittedProperty[1].Trim(); break;
-                                case "Za co hodnocení": newMark.ForWhat = splittedProperty[1].Trim(); break;
-                                case "Stručný komentář": newMark.StructComment = splittedProperty[1].Trim(); break;
-                            }
-                        }
-                        newRatedSubject.Marks.Add(newMark);
-                    }
-                    marksTable.RatedSubjects.Add(newRatedSubject);
-                }
-                return marksTable;
-            }
-            return null;
-        }
-
-        internal static MarkInfo GetMarkInfo(HtmlDocument doc)
+        private static String GetUserName(HtmlDocument doc)
         {
-            var nodes = doc.DocumentNode.Descendants().Where(noud => noud.GetAttributeValue("class","NULL") == "znamkaInfo uprostred barevny");
-            if (nodes.Count()>0)
+            var nodes = doc.DocumentNode.Descendants().Where(node => node.Id == "zobraz_mPrihlas_nabidka");
+            if (nodes.Count() > 0)
             {
-                MarkInfo markInfo = new MarkInfo();
-                HtmlNode mainNode = nodes.ElementAt(0).ParentNode;
-                foreach (HtmlNode actualPropertyNode in mainNode.Descendants("div"))
-                {
-                    if (actualPropertyNode.FirstChild.Name=="span")
-                    {
-                        String propertyName = actualPropertyNode.FirstChild.InnerText;
-                        switch(propertyName)
-                        {
-                            case "Předmět":
-                                markInfo.Subject = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Datum zkoušky":
-                                markInfo.Date = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Datum zadání hodnocení":
-                                markInfo.DateOfEnter = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Hodnocení":
-                                markInfo.Value = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Váha hodnocení":
-                                markInfo.MarkValuability = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Zadal":
-                                markInfo.Teacher = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Za co hodnocení":
-                                markInfo.ForWhat = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Okruh učiva":
-                                markInfo.TeachingOkruh = actualPropertyNode.LastChild.InnerText;
-                                break;
-                            case "Stručný komentář":
-                                markInfo.StructComment = actualPropertyNode.LastChild.InnerText;
-                                break;
-                        }
-                    }
-                }
-                    return markInfo;
+                return nodes.ElementAt(0).InnerText;
             }
-            return null;
-        }
-
-        private static void SetDayInfo(HtmlNode usedNode,Day day)
-        {
-            IEnumerable<HtmlNode> nodes = usedNode.Descendants().Where(node => node.Name == "th");
-            if(nodes.Count()>0)
-            {
-                HtmlNode dayNode = nodes.ElementAt(0);
-                day.DayInWeek = dayNode.ChildNodes[0].InnerText;
-                day.Date = dayNode.ChildNodes[1].InnerText.Replace("(", "").Replace(")", "");
-            }
+            return "JménoNenalezeno";
         }
     }
 }

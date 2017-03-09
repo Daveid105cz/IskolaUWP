@@ -6,7 +6,7 @@
     RequestedTheme="Light">
     <Application.Resources>
         <Style TargetType="ListView" x:Key="VerticalListView">
-         <!--   <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <!--   <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
 
             <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Enabled" />
@@ -31,6 +31,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="ListView" x:Key="DefLW"/>
+        <ControlTemplate x:Key="DefaultTabItemTemplate" TargetType="PivotItem">
+            <Grid>
+                
+                <ContentPresenter Content="{TemplateBinding Content}"/>
+                <ProgressRing Name="DownloadRing" Height="40" Width="40" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Visible" IsActive="{Binding IsDownloading}"/>
+            </Grid>
+        </ControlTemplate>
     </Application.Resources>
 </Application>

@@ -19,19 +19,15 @@ namespace Iskola
         public LoginPage()
         {
             this.InitializeComponent();
-        }
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
             _ac = new AccountControl();
             _ac.GetUsers();
+            this.NavigationCacheMode = NavigationCacheMode.Required;
         }
-
         private async void loginButton_Click(object sender, RoutedEventArgs e)
         {
             SetControls(false);
-            App.Client = new IskolaClient();
-            ConnectionResult Result = await App.Client.Login(login.Text, password.Password, school.Text);
+            App.CreateClient();
+            ConnectionResult Result = await App.Client.Login(Login.Text, Password.Password, School.Text);
             SetControls(true);
             if(Result==ConnectionResult.Success)
             {
@@ -50,24 +46,24 @@ namespace Iskola
         }
         private void SetControls(bool State)
         {
-            login.IsEnabled = State;
-            password.IsEnabled = State;
-            school.IsEnabled = State;
-            loginButton.IsEnabled = State;
-            loggingInStatusRing.IsActive = !State;
-            loggingInStatusRing.Visibility = (State) ? Visibility.Collapsed : Visibility.Visible;
+            Login.IsEnabled = State;
+            Password.IsEnabled = State;
+            School.IsEnabled = State;
+            LoginButton.IsEnabled = State;
+            LoggingStatusRing.IsActive = !State;
+            LoggingStatusRing.Visibility = (State) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void ClearCurrent_Click(object sender, RoutedEventArgs e)
         {
-            login.Text = "";
-            password.Password = "";
-            school.Text = "";
+            Login.Text = "";
+            Password.Password = "";
+            School.Text = "";
         }
         private async  void AddNew_Click(object sender,RoutedEventArgs e)
         {
             UserAddDialog uad = new UserAddDialog(Accounts);
-            await uad.ShowAsync();
+            await uad.ShowDialogAsync();
         }
 
         private async void SelectUser_Click(object sender, RoutedEventArgs e)
@@ -75,13 +71,13 @@ namespace Iskola
             UsersSelectionDialog dialog = new UsersSelectionDialog(this);
             dialog.MaxWidth = this.ActualWidth;
             dialog.DataContext = Accounts.Users;
-            await dialog.ShowAsync();
+            await dialog.ShowDialogAsync();
         }
         internal void SelectUser(UserCredential uc)
         {
-            login.Text = uc.Username;
-            password.Password = uc.Password;
-            school.Text = uc.School;
+            Login.Text = uc.Username;
+            Password.Password = uc.Password;
+            School.Text = uc.School;
         }
     }
 }
