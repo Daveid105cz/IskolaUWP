@@ -10,14 +10,22 @@
     d:DesignHeight="300"
     d:DesignWidth="400"
     Name="Main">
-    <ListView 
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListView 
                 SelectionMode="None"
                 IsItemClickEnabled="False"
                 ScrollViewer.VerticalScrollBarVisibility="Disabled"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollMode="Enabled"
                 ScrollViewer.VerticalScrollMode="Disabled"
-                ItemsSource="{Binding Table.Days,ElementName=Main}">
+                ItemsSource="{Binding Table.Days,ElementName=Main}"
+                HorizontalAlignment="Stretch"
+                Grid.Row="1">
         <ListView.ItemTemplate>
             <DataTemplate>
                 <local:DayRow />
@@ -33,4 +41,5 @@
             </Style>
         </ListView.ItemContainerStyle>
     </ListView>
+    </Grid>
 </UserControl>

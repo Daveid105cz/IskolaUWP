@@ -33,9 +33,8 @@
         </Style>
         <ControlTemplate x:Key="DefaultTabItemTemplate" TargetType="PivotItem">
             <Grid>
-                
                 <ContentPresenter Content="{TemplateBinding Content}"/>
-                <ProgressRing Name="DownloadRing" Height="40" Width="40" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Visible" IsActive="{Binding IsDownloading}"/>
+                <ProgressRing Name="DownloadRing" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Visible" IsActive="{Binding IsDownloading}"/>
             </Grid>
         </ControlTemplate>
     </Application.Resources>

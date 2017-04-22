@@ -23,5 +23,7 @@ namespace Iskola.Controls
         {
             this.InitializeComponent();
         }
+
+
     }
 }

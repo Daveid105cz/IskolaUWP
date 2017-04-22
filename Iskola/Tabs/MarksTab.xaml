@@ -1,0 +1,16 @@
+﻿<controls:TabItem
+    x:Class="Iskola.Tabs.MarksTab"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Iskola.Controls"
+    Header="Hodnocení"
+    mc:Ignorable="d">
+
+    <Grid VerticalAlignment="Stretch">
+        <controls:MainSquare SquareHeader="Přehled prospěchu" VerticalAlignment="Stretch">
+            <controls:AllMarksList Marks="{Binding Marks}"/>
+        </controls:MainSquare>
+    </Grid>
+</controls:TabItem>

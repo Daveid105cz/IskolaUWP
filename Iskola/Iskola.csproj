@@ -127,10 +127,12 @@
     <Compile Include="Controls\TableHourDefinition.xaml.cs">
       <DependentUpon>TableHourDefinition.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ItemCountToVisbility.cs" />
     <Compile Include="Converters\SubjectStateToColor.cs" />
     <Compile Include="Converters\ValueToVisibility.cs" />
+    <Compile Include="Converters\WeekDateToString.cs" />
     <Compile Include="DialogHelper.cs" />
     <Compile Include="Dialogs\MarkInfoDialog.xaml.cs">
       <DependentUpon>MarkInfoDialog.xaml</DependentUpon>
@@ -144,9 +146,6 @@
     <Compile Include="Dialogs\UserEditDialog.xaml.cs">
       <DependentUpon>UserEditDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\UsersSelectionDialog.xaml.cs">
-      <DependentUpon>UsersSelectionDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -155,6 +154,12 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StyleSelectors\MarkStyleSelector.cs" />
+    <Compile Include="Tabs\MainTab.xaml.cs">
+      <DependentUpon>MainTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tabs\MarksTab.xaml.cs">
+      <DependentUpon>MarksTab.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -273,15 +278,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\UsersSelectionDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="LoginPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PageFrames\MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tabs\MainTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tabs\MarksTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -292,6 +301,7 @@
       <Name>Iskola.Data</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

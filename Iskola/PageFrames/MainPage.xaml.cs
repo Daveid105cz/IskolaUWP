@@ -1,10 +1,11 @@
-﻿using System;
-using Iskola.Controls;
+﻿using Iskola.Controls;
 using Iskola.Data;
-using Windows.UI.Popups;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+using Iskola.Tabs;
+using System;
 using System.Threading.Tasks;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace Iskola.PageFrames
 {
@@ -15,14 +16,19 @@ namespace Iskola.PageFrames
         {
             this.InitializeComponent();
             this.DataContext = this;
-            foreach(TabItem pivotItem in MainPivot.Items)
-            {
-                pivotItem.DataTab = Client.DataTabs[MainPivot.Items.IndexOf(pivotItem)];
-            }
+            AddPivots();
             Client.OnTimeoutRaised += Client_OnTimeoutRaised;
             Client.OnLoginFailed += Client_OnLoginFailed;
         }
-
+        private void AddPivots()
+        {
+            MainPivot.Items.Add(new MainTab());
+            MainPivot.Items.Add(new MarksTab());
+            foreach (TabItem pivotItem in MainPivot.Items)
+            {
+                pivotItem.DataTab = Client.DataTabs[MainPivot.Items.IndexOf(pivotItem)];
+            }
+        }
         private async void Client_OnLoginFailed()
         {
             MessageDialog dialog = new MessageDialog("Prihlášení selhalo!");
@@ -48,7 +54,8 @@ namespace Iskola.PageFrames
             md.CancelCommandIndex = 1;
             md.DefaultCommandIndex = 0;
             IUICommand chosenCommand = await md.ShowAsync();
-            if (chosenCommand == md.Commands[0])
+            int chosenIndex = md.Commands.IndexOf(chosenCommand);
+            if (chosenIndex == 0)
             {
                 MainCommandBar.IsOpen = false;
                 MainCommandBar.ClosedDisplayMode = AppBarClosedDisplayMode.Hidden;
@@ -57,7 +64,7 @@ namespace Iskola.PageFrames
         }
         private async void RefreshAppBarButton_Click(object sender,Windows.UI.Xaml.RoutedEventArgs e)
         {
-            await Client.DataTabs[MainPivot.SelectedIndex].DownloadDataAsync();
+             await Client.DataTabs[MainPivot.SelectedIndex].DownloadDataAsync();
         }
         private async void MainPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -65,6 +72,5 @@ namespace Iskola.PageFrames
             if (!Client.DataTabs[TabIndex].IsAnythingLoaded)
                 await Client.DataTabs[TabIndex].DownloadDataAsync();
         }
-
     }
 }

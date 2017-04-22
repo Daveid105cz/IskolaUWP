@@ -19,7 +19,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Iskola.Controls
 {
-    public sealed partial class TabItem : PivotItem
+    public partial class TabItem : PivotItem
     {
         private DataTab _dataTab;
 

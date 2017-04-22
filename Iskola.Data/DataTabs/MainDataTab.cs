@@ -3,10 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Popups;
+using Windows.UI.Xaml.Controls;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace Iskola.Data.DataTabs
 {
@@ -18,27 +24,88 @@ namespace Iskola.Data.DataTabs
         Table _actualTable;
         public Table ActualTable { get { return _actualTable; } internal set { _actualTable = value; PropertyChanged_Invoke("ActualTable"); } }
 
+        private int _newMailsCount;
+
+        public int NewMailsCount
+        {
+            get { return _newMailsCount; }
+            internal set { _newMailsCount = value; PropertyChanged_Invoke("NewMailsCount"); }
+        }
+
+        private Dictionary<DateTime, Table> _tables = new Dictionary<DateTime, Table>();
+
+        public Dictionary<DateTime,Table> Tables
+        {
+            get { return _tables; }
+            set { _tables = value; }
+        }
+
+        private DateTime _selectedDate = DateTime.MinValue;
+
+        public DateTime SelectedDate
+        {
+            get { return _selectedDate; }
+            internal set { _selectedDate = value; }
+        }
+        
+
         ObservableCollection<NewsMessage> _news = new ObservableCollection<NewsMessage>();
         public ObservableCollection<NewsMessage> News { get { return _news; } }
 
         public MainDataTab(IskolaClient Client) : base(Client) { }
 
+        public async Task NextWeek()
+        {
+            if (ActualTable.IsNextWeekAvailable)
+            {
+                SelectedDate = ActualTable.TableNextDate;
+                WeekChange = true;
+                await DownloadDataAsync();
+            }
+        }
+        public async Task PreviousWeek()
+        {
+            if (ActualTable.IsPreviousWeekAvailable)
+            {
+                SelectedDate = ActualTable.TablePreviousDate;
+                WeekChange = true;
+                await DownloadDataAsync();
+            }
+        }
+        private bool WeekChange;
         protected async override Task DownloadData()
         {
-            String mainPageContent = await Client.LoadRequest("https://www.iskola.cz/?akce=hlavni");
-            HtmlDocument mainPageDocument = new HtmlDocument();
-            mainPageDocument.LoadHtml(mainPageContent);
-            Client.Username = GetUserName(mainPageDocument);
-            _newMarks.Clear();
-            foreach (NewMark m in GetNewMarks(mainPageDocument))
+            String downloadString = "https://www.iskola.cz/?akce=hlavni";
+            if (_selectedDate != DateTime.MinValue)
             {
-                _newMarks.Add(m);
+                downloadString = "https://www.iskola.cz/?datum="+_selectedDate.Day+"."+_selectedDate.Month+"."+_selectedDate.Year+"&cast=Vychozi&akce=hlavni";
             }
-            ActualTable = GetTable(mainPageDocument);
-            _news.Clear();
-            foreach (NewsMessage n in GetNews(mainPageDocument))
+            if (WeekChange && _tables.ContainsKey(SelectedDate))
+            { WeekChange = false; ActualTable = _tables[SelectedDate]; }
+            else
             {
-                _news.Add(n);
+                String mainPageContent = await Client.LoadRequest(downloadString);
+                HtmlDocument mainPageDocument = new HtmlDocument();
+                mainPageDocument.LoadHtml(mainPageContent);
+                Client.Username = GetUserName(mainPageDocument);
+                NewMailsCount = GetNewMailsCount(mainPageDocument);
+                _newMarks.Clear();
+                foreach (NewMark m in GetNewMarks(mainPageDocument))
+                {
+                    _newMarks.Add(m);
+                }
+                Table loadedTable = GetTable(mainPageDocument);
+                SelectedDate = loadedTable.TableDate;
+                if (_tables.ContainsKey(SelectedDate))
+                    _tables.Remove(SelectedDate);
+                _tables.Add(SelectedDate, loadedTable);
+
+                ActualTable = loadedTable;
+                _news.Clear();
+                foreach (NewsMessage n in GetNews(mainPageDocument))
+                {
+                    _news.Add(n);
+                }
             }
         }
         internal override void LogoutClear()
@@ -46,6 +113,16 @@ namespace Iskola.Data.DataTabs
             _newMarks.Clear();
             _news.Clear();
         }
+        private static int GetNewMailsCount(HtmlDocument doc)
+        {
+            var nodes = doc.DocumentNode.Descendants().Where(node => node.Id == "mPololetiZprav");
+            if (nodes.Count() > 0)
+            {
+                return Convert.ToInt32(nodes.ElementAt(0).InnerText);
+            }
+            return 0;
+        }
+
         private static List<NewMark> GetNewMarks(HtmlDocument doc)
         {
             List<NewMark> marks = new List<NewMark>();
@@ -78,14 +155,46 @@ namespace Iskola.Data.DataTabs
             {
                 HtmlNode tableNode = nodes.ElementAt(0);
                 Table table = new Table();
+                IEnumerable<HtmlNode> timeDateNodes = doc.DocumentNode.Descendants().Where(node => { return node.Id == "kalendar_datum"; });
+                if(timeDateNodes.Count()>0)
+                {
+                    HtmlNode timeDateNode = timeDateNodes.ElementAt(0);
+                    DateTime currentDate = DateTime.Parse(timeDateNode.InnerText);
+                    DateTime previousDate = currentDate.AddDays(-7);
+                    int daysToAdd = ((int)DayOfWeek.Monday - (int)currentDate.AddDays(1).DayOfWeek + 7) % 7;
+                    DateTime nextDate = currentDate.AddDays(daysToAdd+1);
+                    table.TableDate = currentDate;
+                    table.TablePreviousDate = previousDate;
+                    table.TableNextDate = nextDate;
+                    table.IsPreviousWeekAvailable = true;
+                    table.IsNextWeekAvailable = true;
+                    IEnumerable<HtmlNode> variablesNodes = doc.DocumentNode.Descendants().Where(node => { return node.Id == "promenne"; });
+                    if(variablesNodes.Count()>0)
+                    {
+                        HtmlNode textsNode = variablesNodes.ElementAt(0).ChildNodes[0];
+                        String JSONContent = textsNode.InnerText.Replace("&quot;","\"");
+                        JObject jsonObject = JObject.Parse(JSONContent);
+                        DateTime dateFrom = DateTime.Parse(jsonObject["kalendar_datumOd"].Value<String>());
+                        DateTime dateTo = DateTime.Parse(jsonObject["kalendar_datumDo"].Value<String>());
+                        if (table.TablePreviousDate < dateFrom)
+                            table.TablePreviousDate = dateFrom;
+                        if (currentDate == dateFrom)
+                            table.IsPreviousWeekAvailable = false;
+                        if (table.TableNextDate > dateTo)
+                            table.IsNextWeekAvailable = false;
+                        
+                    }
+                }
                 ushort HourID = 0;
                 foreach (var node in tableNode.FirstChild.FirstChild.ChildNodes)
                 {
                     if (node.GetAttributeValue("class", "N").Contains("zahlaviHodina"))
                     {
-                        HourDefinition hd = new HourDefinition();
-                        hd.FromTo = node.LastChild.InnerText;
-                        hd.HourNumber = Convert.ToUInt16(Regex.Replace(node.FirstChild.InnerText, "[^0-9]", ""));
+                        HourDefinition hd = new HourDefinition()
+                        {
+                            FromTo = node.LastChild.InnerText,
+                            HourNumber = Convert.ToUInt16(Regex.Replace(node.FirstChild.InnerText, "[^0-9]", ""))
+                        };
                         HourID++;
                         table.HourDefinitions.Add(hd);
                     }

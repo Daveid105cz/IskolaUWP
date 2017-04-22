@@ -141,14 +141,18 @@ namespace Iskola.Data
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Property));
         }
-        public async void Logout()
+        public void Logout()
         {
-            await LoadRequest("https://www.iskola.cz/?cast=Uzivatel&akce=odhlas",false);
+            SendLogoutRequest();
             foreach(DataTab proceededDataTable in _dataTabs)
             {
                 proceededDataTable.LogoutClear();
             }
             _dataTabs.Clear();
+        }
+        private async void SendLogoutRequest()
+        {
+            await LoadRequest("https://www.iskola.cz/?cast=Uzivatel&akce=odhlas", false);
         }
     }   
     public enum ConnectionResult

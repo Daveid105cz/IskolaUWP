@@ -111,6 +111,7 @@
     <Compile Include="DataTabs\MainDataTab.cs" />
     <Compile Include="DataTabs\RatingDataTab.cs" />
     <Compile Include="IskolaClient.cs" />
+    <Compile Include="IskolaClient_Background.cs" />
     <Compile Include="ItemsRatings.cs" />
     <Compile Include="MainPageItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,12 +6,17 @@ using Iskola.Data;
 using Windows.UI.Popups;
 using Iskola.Security;
 using Iskola.Dialogs;
+using System.Windows.Input;
+using System.Diagnostics;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace Iskola
 {
     public sealed partial class LoginPage : Page
     {
         AccountControl _ac;
+        private object flyoutbase;
+
         private AccountControl Accounts
         {
             get { return _ac; }
@@ -21,6 +26,7 @@ namespace Iskola
             this.InitializeComponent();
             _ac = new AccountControl();
             _ac.GetUsers();
+            UsersListView.ItemsSource = Accounts.Users;
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
         private async void loginButton_Click(object sender, RoutedEventArgs e)
@@ -66,12 +72,9 @@ namespace Iskola
             await uad.ShowDialogAsync();
         }
 
-        private async void SelectUser_Click(object sender, RoutedEventArgs e)
+        private void SelectUser_Click(object sender, RoutedEventArgs e)
         {
-            UsersSelectionDialog dialog = new UsersSelectionDialog(this);
-            dialog.MaxWidth = this.ActualWidth;
-            dialog.DataContext = Accounts.Users;
-            await dialog.ShowDialogAsync();
+            UserSelectionSplitView.IsPaneOpen = !UserSelectionSplitView.IsPaneOpen;
         }
         internal void SelectUser(UserCredential uc)
         {
@@ -79,5 +82,59 @@ namespace Iskola
             Password.Password = uc.Password;
             School.Text = uc.School;
         }
+
+        private void UsersListView_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            var SelectedItem = ((FrameworkElement)e.OriginalSource).DataContext;
+            if (SelectedItem != null)
+            {
+                foreach (var Item in UserMenuFlyout.Items)
+                    Item.DataContext = SelectedItem;
+                UserMenuFlyout.ShowAt(listView,e.GetPosition(listView));
+            }
+        }
+        internal void Remove(UserCredential Credential)
+        {
+            Accounts.Users.Remove(Credential);
+            Credential.Remove();
+        }
+        internal async void Edit(UserCredential Credential)
+        {
+            UserEditDialog ued = new UserEditDialog(Credential);
+            await ued.ShowDialogAsync();
+        }
+
+        private void EditFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem menuFlyoutItem)
+            {
+                if (menuFlyoutItem.DataContext is UserCredential credential)
+                {
+                    Edit(credential);
+                }
+            }
+        }
+        private void RemoveFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem menuFlyoutItem)
+            {
+                if (menuFlyoutItem.DataContext is UserCredential credential)
+                {
+                    Remove(credential);
+                }
+            }
+        }
+
+        private void UsersListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            SelectUser(e.ClickedItem as UserCredential);
+        }
+
+        private void UsersListView_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            UserSelectionSplitView.IsPaneOpen = false;
+        }
+
     }
 }

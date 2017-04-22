@@ -18,6 +18,43 @@ namespace Iskola.Data
     }
     public class Table
     {
+        private DateTime _tableDate;
+
+        public DateTime TableDate
+        {
+            get { return _tableDate; }
+            set { _tableDate = value; }
+        }
+        private DateTime _tableNextDate;
+
+        public DateTime TableNextDate
+        {
+            get { return _tableNextDate; }
+            set { _tableNextDate = value; }
+        }
+        private DateTime _tablePreviousDate;
+
+        public DateTime TablePreviousDate
+        {
+            get { return _tablePreviousDate; }
+            set { _tablePreviousDate = value; }
+        }
+
+        private bool _isNextWeekAvailable;
+
+        public bool IsNextWeekAvailable
+        {
+            get { return _isNextWeekAvailable; }
+            set { _isNextWeekAvailable = value; }
+        }
+        private bool _isPreviousWeekAvailable;
+
+        public bool IsPreviousWeekAvailable
+        {
+            get { return _isPreviousWeekAvailable; }
+            set { _isPreviousWeekAvailable = value; }
+        }
+
         internal ObservableCollection<HourDefinition> _hourDefinitions = new ObservableCollection<HourDefinition>();
         public ObservableCollection<HourDefinition> HourDefinitions { get { return _hourDefinitions; } }
 

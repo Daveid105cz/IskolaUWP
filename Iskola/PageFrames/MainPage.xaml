@@ -1,12 +1,11 @@
 ﻿<Page
     x:Class="Iskola.PageFrames.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Iskola.PageFrames"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:convert="using:Iskola.Converters"
     xmlns:controls="using:Iskola.Controls"
+    xmlns:tabs="using:Iskola.Tabs"
     mc:Ignorable="d"
     Background="Black">
     <Page.Transitions>
@@ -28,55 +27,20 @@
             </AppBarButton>
             <CommandBar.Content>
                 <StackPanel Orientation="Vertical" Margin="2">
-                    <TextBlock Text="Přihlášen jako:" FontSize="16" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Přihlášen jako:" FontSize="16" FontWeight="Bold"/>
+                        <FontIcon Glyph="&#xE119;" Margin="30,0,0,0" Visibility="Collapsed"/>
+                        <TextBlock Text="{Binding Client.MainDataTab.NewMailsCount}" FontSize="15" FontWeight="Bold" Margin="5,0,0,0" Visibility="Collapsed"/>
+                    </StackPanel>
+                    
                     <TextBlock Text="{Binding Client.Username}" FontSize="16" FontWeight="Bold"/>
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>
     </Page.BottomAppBar>
-    <Page.Resources>
-        <convert:ItemCountToVisbility x:Key="CountToVisibility"/>
-    </Page.Resources>
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Pivot SelectionChanged="MainPivot_SelectionChanged" Name="MainPivot">
-            <controls:TabItem Header="Domů">
-                <ScrollViewer Margin="0,0,0,2" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled">
-                    <StackPanel>
-                        <controls:MainSquare SquareHeader="Rozvrh">
-                            <controls:TableControl Table="{Binding ActualTable}" Margin="5,0"/>
-                        </controls:MainSquare>
-                        <controls:MainSquare SquareHeader="Hodnocení v průběhu týdne" Margin="0,15,0,0" Visibility="{Binding NewestMarks.Count,Converter={StaticResource CountToVisibility}}">
-                            <ListView ItemsSource="{Binding NewestMarks}" SelectionMode="None" IsItemClickEnabled="False" Margin="5,0">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <RelativePanel>
-                                            <TextBlock x:Name="date" Text="{Binding Date}" FontSize="12"/>
-                                            <TextBlock x:Name="midText" Text=", vložil/a" RelativePanel.RightOf="date" FontSize="12"/>
-                                            <TextBlock Text="{Binding Teacher}" RelativePanel.RightOf="midText" Margin="2,0,0,0" FontSize="12"/>
-                                            <TextBlock x:Name="subject" Text="{Binding Subject}" RelativePanel.Below="date"/>
-                                            <TextBlock x:Name="midText2" Text="," RelativePanel.RightOf="subject" RelativePanel.AlignBottomWith="subject"/>
-                                            <TextBlock Text="{Binding Value}" RelativePanel.RightOf="midText2" RelativePanel.AlignBottomWith="subject" Margin="2,0,0,0" FontWeight="Bold"/>
-                                        </RelativePanel>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="Padding" Value="0"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                            </ListView>
-                        </controls:MainSquare>
-                    </StackPanel>
-                </ScrollViewer>
-            </controls:TabItem>
-            <controls:TabItem Header="Hodnocení">
-                <Grid VerticalAlignment="Stretch">
-                    <controls:MainSquare SquareHeader="Přehled prospěchu" VerticalAlignment="Stretch">
-                        <controls:AllMarksList Marks="{Binding Marks}"/>
-                    </controls:MainSquare>
-                </Grid>
-            </controls:TabItem>
         </Pivot>
-
     </Grid>
 </Page>

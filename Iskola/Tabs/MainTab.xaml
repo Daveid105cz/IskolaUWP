@@ -1,0 +1,67 @@
+﻿<controls:TabItem
+    x:Class="Iskola.Tabs.MainTab"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Iskola.Controls"
+    xmlns:convert="using:Iskola.Converters"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    Header="Domů"
+    >
+    <controls:TabItem.Resources>
+        <convert:ItemCountToVisbility x:Key="CountToVisibility"/>
+        <convert:WeekDateToString x:Key="WeekDateToStringConverter"/>
+        <convert:BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </controls:TabItem.Resources>
+    <ScrollViewer Margin="0,0,0,2" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled">
+        <StackPanel>
+            <controls:MainSquare SquareHeader="Rozvrh">
+                <StackPanel Orientation="Vertical">
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="280"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Background="LightGray" HorizontalAlignment="Stretch" Click="Previous_Click" Visibility="{Binding ActualTable.IsPreviousWeekAvailable,Converter={StaticResource BoolToVis}}">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE00E;" FontSize="12"/>
+                        </Button>
+                        <Border Background="LightGray" Grid.Column="1" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{Binding ActualTable,Converter={StaticResource WeekDateToStringConverter}}" HorizontalAlignment="Center"/>
+                        </Border>
+                        <Button Background="LightGray" Grid.Column="2" HorizontalAlignment="Stretch" Click="Next_Click" Visibility="{Binding ActualTable.IsNextWeekAvailable,Converter={StaticResource BoolToVis}}">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE00F;" FontSize="12"/>
+                        </Button>
+                    </Grid>
+                    <controls:TableControl Table="{Binding ActualTable}" Margin="5,0"/>
+                </StackPanel>
+                
+                
+            </controls:MainSquare>
+            <controls:MainSquare SquareHeader="Hodnocení v průběhu týdne" Margin="0,5,0,0" Visibility="{Binding NewestMarks.Count,Converter={StaticResource CountToVisibility}}">
+                <ListView ItemsSource="{Binding NewestMarks}" SelectionMode="None" IsItemClickEnabled="False" Margin="5,0" ScrollViewer.VerticalScrollMode="Disabled">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <RelativePanel>
+                                <TextBlock x:Name="date" Text="{Binding Date}" FontSize="12"/>
+                                <TextBlock x:Name="midText" Text=", vložil/a" RelativePanel.RightOf="date" FontSize="12"/>
+                                <TextBlock Text="{Binding Teacher}" RelativePanel.RightOf="midText" Margin="2,0,0,0" FontSize="12"/>
+                                <TextBlock x:Name="subject" Text="{Binding Subject}" RelativePanel.Below="date"/>
+                                <TextBlock x:Name="midText2" Text="," RelativePanel.RightOf="subject" RelativePanel.AlignBottomWith="subject"/>
+                                <TextBlock Text="{Binding Value}" RelativePanel.RightOf="midText2" RelativePanel.AlignBottomWith="subject" Margin="2,0,0,0" FontWeight="Bold"/>
+                            </RelativePanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </controls:MainSquare>
+        </StackPanel>
+    </ScrollViewer>
+</controls:TabItem>

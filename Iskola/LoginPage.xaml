@@ -7,8 +7,55 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource AppBarToggleButtonBackgroundChecked}"
-    >
-    <ScrollViewer ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+    Name="Main">
+    <SplitView Name="UserSelectionSplitView">
+        <SplitView.Pane>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Uživatelé:" FontWeight="Bold" Margin="5"/>
+                <ListView Name="UsersListView" Margin="3,0" SelectionMode="None" IsItemClickEnabled="True" RightTapped="UsersListView_RightTapped" ItemClick="UsersListView_ItemClick" Grid.Row="1" Tapped="UsersListView_Tapped">
+                    <ListView.Resources>
+                        <MenuFlyout x:Name="UserMenuFlyout">
+                            <MenuFlyout.Items>
+                                <MenuFlyoutItem x:Name="EditFlyoutItem"  Text="Edit" Click="EditFlyoutItem_Click"/>
+                                <MenuFlyoutItem x:Name="RemoveFlyoutItem" Text="Remove" Click="RemoveFlyoutItem_Click"/>
+                            </MenuFlyout.Items>
+                        </MenuFlyout>
+                    </ListView.Resources>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="LightGray" Height="50">
+                                <Grid Margin="5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Login:" FontWeight="Bold"/>
+                                    <TextBlock Text="Škola:" Grid.Row="1" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Username}" Grid.Column="1"/>
+                                    <TextBlock Text="{Binding School}" Grid.Column="1" Grid.Row="1"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                            <Setter Property="Margin" Value="0,1"></Setter>
+                            <Setter Property="Padding" Value="0"></Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    
+                </ListView>
+            </Grid>
+        </SplitView.Pane>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="ScreenSize">
                 <VisualStateGroup.States>
@@ -33,33 +80,36 @@
                 </VisualStateGroup.States>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid Background="{ThemeResource AppBarToggleButtonBackgroundChecked}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="ColumnL" Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition x:Name="ColumnR" Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <ProgressRing x:Name="LoggingStatusRing" Grid.ColumnSpan="3" Visibility="Visible"  Height="130" Width="130" Foreground="White" VerticalAlignment="Top" Margin="45,35,45,0"/>
-            <StackPanel x:Name="LoginPanel" Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top"  Margin="0,-4,0,0">
-                <Image HorizontalAlignment="Center" Height="68" Margin="0,68,0,68" VerticalAlignment="Top" Width="68" Source="Assets/Logos/AppLogo.png"/>
-                <Grid>
-                    <Button Click="SelectUser_Click">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE125;" />
+        <ScrollViewer ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <Grid Background="{ThemeResource AppBarToggleButtonBackgroundChecked}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="ColumnL" Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition x:Name="ColumnR" Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <ProgressRing x:Name="LoggingStatusRing" Grid.ColumnSpan="3" Visibility="Visible"  Height="130" Width="130" Foreground="White" VerticalAlignment="Top" Margin="45,35,45,0"/>
+                <StackPanel x:Name="LoginPanel" Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top"  Margin="0,-4,0,0">
+                    <Image HorizontalAlignment="Center" Height="68" Margin="0,68,0,68" VerticalAlignment="Top" Width="68" Source="Assets/Logos/AppLogo.png"/>
+                    <Grid>
+                        <Button Click="SelectUser_Click">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE125;" />
+                        </Button>
+                        <Button HorizontalAlignment="Center" Click="AddNew_Click">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE1E2;" />
+                        </Button>
+                        <Button HorizontalAlignment="Right" Click="ClearCurrent_Click">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" />
+                        </Button>
+                    </Grid>
+                    <TextBox x:Name="Login" PlaceholderText="Login" Margin="0,10,0,0"/>
+                    <PasswordBox x:Name="Password" PlaceholderText="Heslo" Margin="0,30,0,0"/>
+                    <TextBox x:Name="School" PlaceholderText="Škola" Margin="0,30"/>
+                    <Button x:Name="LoginButton" HorizontalAlignment="Center" Background="#cce6ff" BorderBrush="#3399db" Click="loginButton_Click">
+                        <TextBlock Text="Přihlásit" FontSize="18" Foreground="#3399db"/>
                     </Button>
-                    <Button HorizontalAlignment="Center" Click="AddNew_Click">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE1E2;" />
-                    </Button>
-                    <Button HorizontalAlignment="Right" Click="ClearCurrent_Click">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" />
-                    </Button>
-                </Grid>
-                <TextBox x:Name="Login" PlaceholderText="Login" Margin="0,10,0,0"/>
-                <PasswordBox x:Name="Password" PlaceholderText="Heslo" Margin="0,30,0,0"/>
-                <TextBox x:Name="School" PlaceholderText="Škola" Margin="0,30"/>
-                <Button x:Name="LoginButton" HorizontalAlignment="Center" Background="#cce6ff" BorderBrush="#3399db" Click="loginButton_Click">
-                    <TextBlock Text="Přihlásit" FontSize="18" Foreground="#3399db"/>
-                </Button>
-            </StackPanel>
-        </Grid>
-    </ScrollViewer>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </SplitView>
+    
 </Page>

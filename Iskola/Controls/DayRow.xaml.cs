@@ -60,7 +60,9 @@ namespace Iskola.Controls
                         {
                             VerticalAlignment = VerticalAlignment.Top,
                             Height = 20,
-                            Fill = new SolidColorBrush(Colors.LightCyan)
+                            Fill = new SolidColorBrush(Colors.LightCyan),
+                            RadiusX=4,
+                            RadiusY=4
                         };
                         Grid.SetColumnSpan(schoolActionBackgroundRectangle, actualSchoolAction.ActionLenght);
                         Grid.SetColumn(schoolActionBackgroundRectangle, actualSchoolAction.ActionPosition);
